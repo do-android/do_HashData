@@ -1,0 +1,10 @@
+*.class
+*.apk
+bin/
+gen/
+.settings/
+proguard/
+*.classpath
+/doExt_do_HashData/do_HashData.zip
+/doExt_do_HashData/libs/docore.jar
+/doExt_do_HashData/do_build.xml
