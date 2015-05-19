@@ -1,12 +1,14 @@
 package doext.implement;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
-import core.helper.jsonparse.DoJsonNode;
-import core.helper.jsonparse.DoJsonValue;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import core.helper.DoJsonHelper;
 import core.interfaces.DoIHashData;
 import core.interfaces.DoIScriptEngine;
 import core.interfaces.datamodel.DoIDataSource;
@@ -23,11 +25,11 @@ import doext.define.do_HashData_MAbstract;
  */
 public class do_HashData_Model extends do_HashData_MAbstract implements do_HashData_IMethod, DoIHashData, DoIDataSource {
 
-	private DoJsonNode data;
+	private JSONObject data;
 
 	public do_HashData_Model() throws Exception {
 		super();
-		data = new DoJsonNode();
+		data = new JSONObject();
 	}
 
 	/**
@@ -39,7 +41,7 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public boolean invokeSyncMethod(String _methodName, DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+	public boolean invokeSyncMethod(String _methodName, JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
 		if ("getCount".equals(_methodName)) {
 			getCount(_dictParas, _scriptEngine, _invokeResult);
 			return true;
@@ -94,7 +96,7 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 *                    DoInvokeResult(this.getUniqueKey());
 	 */
 	@Override
-	public boolean invokeAsyncMethod(String _methodName, DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, String _callbackFuncName) throws Exception {
+	public boolean invokeAsyncMethod(String _methodName, JSONObject _dictParas, DoIScriptEngine _scriptEngine, String _callbackFuncName) throws Exception {
 		// ...do something
 		return super.invokeAsyncMethod(_methodName, _dictParas, _scriptEngine, _callbackFuncName);
 	}
@@ -107,13 +109,13 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public void addData(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		DoJsonNode _newData = _dictParas.getOneNode("data");
-		Map<String, DoJsonValue> _allKeyValues = _newData.getAllKeyValues();
-		Set<String> _keySet = _allKeyValues.keySet();
-		for (String _key : _keySet) {
-			DoJsonValue _value = _allKeyValues.get(_key);
-			data.setOneValue(_key, _value);
+	public void addData(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+		JSONObject _newData = DoJsonHelper.getJSONObject(_dictParas, "data");
+		Map<String, Object> _dataList = DoJsonHelper.getAllKeyValues(_newData);
+		for (Entry<String, Object> _entry : _dataList.entrySet()) {
+			String _key = _entry.getKey();
+			String _value = DoJsonHelper.getText(_entry.getValue(), "");
+			data.put(_key, _value);
 		}
 	}
 
@@ -125,10 +127,10 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public void addOne(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		String _key = _dictParas.getOneText("key", "");
-		DoJsonValue _value = _dictParas.getOneValue("value");
-		data.setOneValue(_key, _value);
+	public void addOne(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+		String _key = DoJsonHelper.getString(_dictParas, "key", "");
+		Object _value = DoJsonHelper.get(_dictParas, "value");
+		data.put(_key, _value);
 	}
 
 	/**
@@ -139,8 +141,8 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public void getCount(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		_invokeResult.setResultInteger(data.getAllKeyValues().size());
+	public void getCount(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+		_invokeResult.setResultInteger(DoJsonHelper.getAllKeyValues(data).size());
 	}
 
 	/**
@@ -151,12 +153,13 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public void getData(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		List<String> _keys = _dictParas.getOneTextArray("keys");
-		List<DoJsonValue> _data = new ArrayList<DoJsonValue>();
-		for (String _key : _keys) {
-			DoJsonValue _value = data.getOneValue(_key);
-			_data.add(_value);
+	public void getData(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+		JSONArray _keys = DoJsonHelper.getJSONArray(_dictParas, "keys");
+		JSONArray _data = new JSONArray();
+		for (int i = 0; i < _keys.length(); i++) {
+			String _key = _keys.getString(i);
+			Object _value = DoJsonHelper.get(data, _key);
+			_data.put(_value);
 		}
 		_invokeResult.setResultArray(_data);
 	}
@@ -169,11 +172,11 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public void getOne(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		String _key = _dictParas.getOneText("key", "");
-		DoJsonValue _value = data.getOneValue(_key);
-		DoJsonNode _node = new DoJsonNode();
-		_node.setOneValue(_key, _value);
+	public void getOne(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+		String _key = DoJsonHelper.getString(_dictParas, "key", "");
+		Object _value = DoJsonHelper.get(data, _key);
+		JSONObject _node = new JSONObject();
+		_node.put(_key, _value);
 		_invokeResult.setResultNode(_node);
 	}
 
@@ -185,10 +188,8 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public void removeAll(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		data.getAllKeyValues().clear();
-		data.getAllKeys().clear();
-		data.getAllValues().clear();
+	public void removeAll(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+		DoJsonHelper.clear(data);
 	}
 
 	/**
@@ -199,13 +200,11 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public void removeData(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		List<String> _keys = _dictParas.getOneTextArray("keys");
-		for (String _key : _keys) {
-			DoJsonValue _value = data.getOneValue(_key);
-			data.getAllKeyValues().remove(_key);
-			data.getAllValues().remove(_value);
-			data.getAllKeys().remove(_key);
+	public void removeData(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+		JSONArray _keys = DoJsonHelper.getJSONArray(_dictParas, "keys");
+		for (int i = 0; i < _keys.length(); i++) {
+			String _key = _keys.getString(i);
+			DoJsonHelper.getAllKeyValues(data).remove(_key);
 		}
 	}
 
@@ -217,52 +216,43 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 * @_invokeResult 用于返回方法结果对象
 	 */
 	@Override
-	public void removeOne(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		String _key = _dictParas.getOneText("key", "");
-		DoJsonValue _value = data.getOneValue(_key);
-		data.getAllKeyValues().remove(_key);
-		data.getAllValues().remove(_value);
-		data.getAllKeys().remove(_key);
+	public void removeOne(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+		String _key = DoJsonHelper.getString(_dictParas, "key", "");
+		DoJsonHelper.getAllKeyValues(data).remove(_key);
 	}
 
 	@Override
-	public void getAll(DoJsonNode _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
+	public void getAll(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
 		_invokeResult.setResultNode(data);
 	}
 
 	@Override
 	public List<String> getAllKey() {
-		return data.getAllKeys();
+		return DoJsonHelper.getAllKeys(data);
 	}
 
 	@Override
-	public Object getData(String _key) {
-		return data.getOneValue(_key);
+	public Object getData(String _key) throws JSONException {
+		return DoJsonHelper.get(data, _key);
 	}
 
 	@Override
-	public DoJsonValue getJsonData() throws Exception {
-		DoJsonValue _value = new DoJsonValue();
-		_value.setNode(data);
-		return _value;
+	public Object getJsonData() throws Exception {
+		return data;
 	}
 
 	@Override
 	public void setData(String _key, Object _data) throws Exception {
-		if (_data instanceof DoJsonNode) {
-			data.setOneNode(_key, (DoJsonNode) _data);
-		}
+		data.put(_key, _data);
 	}
 
 	@Override
 	public String serialize() throws Exception {
-		return data.exportToText();
+		return data.toString();
 	}
 
 	@Override
 	public Object unSerialize(String _str) throws Exception {
-		DoJsonValue _value = new DoJsonValue();
-		_value.loadDataFromText(_str);
-		return _value;
+		return DoJsonHelper.loadDataFromText(_str);
 	}
 }
