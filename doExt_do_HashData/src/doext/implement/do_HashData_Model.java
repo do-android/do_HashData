@@ -189,7 +189,7 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 */
 	@Override
 	public void removeAll(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		DoJsonHelper.clear(data);
+		this.data = new JSONObject();
 	}
 
 	/**
@@ -204,7 +204,7 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 		JSONArray _keys = DoJsonHelper.getJSONArray(_dictParas, "keys");
 		for (int i = 0; i < _keys.length(); i++) {
 			String _key = _keys.getString(i);
-			DoJsonHelper.getAllKeyValues(data).remove(_key);
+			data.remove(_key);
 		}
 	}
 
@@ -218,7 +218,7 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	@Override
 	public void removeOne(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
 		String _key = DoJsonHelper.getString(_dictParas, "key", "");
-		DoJsonHelper.getAllKeyValues(data).remove(_key);
+		data.remove(_key);
 	}
 
 	@Override
