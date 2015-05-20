@@ -175,9 +175,7 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	public void getOne(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
 		String _key = DoJsonHelper.getString(_dictParas, "key", "");
 		Object _value = DoJsonHelper.get(data, _key);
-		JSONObject _node = new JSONObject();
-		_node.put(_key, _value);
-		_invokeResult.setResultNode(_node);
+		_invokeResult.setResultValue(_value == null ? JSONObject.NULL : _value);
 	}
 
 	/**
