@@ -113,9 +113,7 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 		JSONObject _newData = DoJsonHelper.getJSONObject(_dictParas, "data");
 		Map<String, Object> _dataList = DoJsonHelper.getAllKeyValues(_newData);
 		for (Entry<String, Object> _entry : _dataList.entrySet()) {
-			String _key = _entry.getKey();
-			String _value = DoJsonHelper.getText(_entry.getValue(), "");
-			data.put(_key, _value);
+			data.put(_entry.getKey(), _entry.getValue());
 		}
 	}
 
