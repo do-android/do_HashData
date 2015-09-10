@@ -12,18 +12,6 @@ import core.object.DoUIContainer;
 import core.object.DoUIModule;
 
 public class DoPage implements DoIPage {
-	
-	@Override
-	public void setTransparent(boolean transparent) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isTransparent() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 
 	@Override
@@ -133,6 +121,18 @@ public class DoPage implements DoIPage {
 	public boolean isFullScreen() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public boolean isTransparent() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setTransparent(boolean arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
