@@ -32,6 +32,26 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 		data = new JSONObject();
 	}
 
+	@Override
+	public void loadSync(String _content) throws Exception {
+		super.loadSync(_content);
+		loadModel(_content);
+	}
+
+	@Override
+	public void load(String _content) throws Exception {
+		super.load(_content);
+		loadModel(_content);
+	}
+
+	private void loadModel(String _content) throws Exception {
+		if (data == null) {
+			data = new JSONObject(_content);
+		} else {
+			addData(new JSONObject(_content));
+		}
+	}
+
 	/**
 	 * 同步方法，JS脚本调用该组件对象方法时会被调用，可以根据_methodName调用相应的接口实现方法；
 	 * 
@@ -110,7 +130,10 @@ public class do_HashData_Model extends do_HashData_MAbstract implements do_HashD
 	 */
 	@Override
 	public void addData(JSONObject _dictParas, DoIScriptEngine _scriptEngine, DoInvokeResult _invokeResult) throws Exception {
-		JSONObject _newData = DoJsonHelper.getJSONObject(_dictParas, "data");
+		addData(DoJsonHelper.getJSONObject(_dictParas, "data"));
+	}
+
+	private void addData(JSONObject _newData) throws JSONException {
 		Map<String, Object> _dataList = DoJsonHelper.getAllKeyValues(_newData);
 		for (Entry<String, Object> _entry : _dataList.entrySet()) {
 			data.put(_entry.getKey(), _entry.getValue());
